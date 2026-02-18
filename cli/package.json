@@ -1,0 +1,27 @@
+{
+  "name": "gabe-monitor",
+  "version": "1.0.0",
+  "description": "Lightweight cron job monitoring. Know when your scheduled jobs fail.",
+  "bin": {
+    "gabe": "index.js"
+  },
+  "keywords": [
+    "cron",
+    "monitoring",
+    "heartbeat",
+    "uptime",
+    "crontab",
+    "devops",
+    "alerting",
+    "webhook",
+    "slack",
+    "dead-man-switch"
+  ],
+  "author": "usegabe",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Scolliq/gabe"
+  },
+  "homepage": "https://scolliq.github.io/gabe"
+}
