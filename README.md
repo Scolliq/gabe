@@ -1,8 +1,12 @@
 # gabe
 
+[![npm version](https://img.shields.io/npm/v/gabe-monitor)](https://www.npmjs.com/package/gabe-monitor)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Cloudflare Workers](https://img.shields.io/badge/runs%20on-Cloudflare%20Workers-F38020)](https://workers.cloudflare.com)
+
 Lightweight cron job monitoring. Get alerted when scheduled jobs fail silently.
 
-**[Website](https://scolliq.github.io/gabe)** &middot; **[API](https://gabe.usegabe.workers.dev)**
+**[Website](https://scolliq.github.io/gabe)** &middot; **[API](https://gabe.usegabe.workers.dev)** &middot; **[npm](https://www.npmjs.com/package/gabe-monitor)**
 
 ---
 

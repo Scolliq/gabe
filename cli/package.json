@@ -1,7 +1,7 @@
 {
   "name": "gabe-monitor",
-  "version": "1.0.0",
-  "description": "Lightweight cron job monitoring. Know when your scheduled jobs fail.",
+  "version": "1.0.1",
+  "description": "Lightweight cron job heartbeat monitor. Add one curl to your crontab — get Slack/Discord alerts when jobs fail silently. Free tier, no install.",
   "bin": {
     "gabe": "index.js"
   },
@@ -15,7 +15,16 @@
     "alerting",
     "webhook",
     "slack",
-    "dead-man-switch"
+    "dead-man-switch",
+    "healthcheck",
+    "healthchecks",
+    "cronitor",
+    "cron-monitor",
+    "job-scheduler",
+    "discord",
+    "notification",
+    "cloudflare-workers",
+    "serverless"
   ],
   "author": "usegabe",
   "license": "MIT",
