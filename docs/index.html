@@ -273,7 +273,7 @@
           <ul>
             <li>3 monitors</li>
             <li>2-minute check interval</li>
-            <li>Email alerts</li>
+            <li>Webhook alerts (Slack, Discord, etc.)</li>
           </ul>
           <a href="https://gabe.usegabe.workers.dev/api/signup" class="plan-btn outline">Create account</a>
         </div>
@@ -284,7 +284,7 @@
           <ul>
             <li>20 monitors</li>
             <li>1-minute check interval</li>
-            <li>Email and Slack alerts</li>
+            <li>Webhook + email alerts</li>
             <li>Priority support</li>
           </ul>
           <a href="https://buy.stripe.com/test_28E6oI8VM6m26wB1Js7ok00" class="plan-btn fill">Upgrade</a>
@@ -314,7 +314,7 @@
           <span class="ep-path">/api/monitors</span>
         </div>
         <p class="ep-desc">Create a monitor. Returns a ping URL.</p>
-        <p class="ep-body">{"name": "my-job", "interval_minutes": 60}</p>
+        <p class="ep-body">{"name": "my-job", "interval_minutes": 60, "webhook_url": "https://hooks.slack.com/..."}</p>
       </div>
 
       <div class="endpoint">

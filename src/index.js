@@ -85,6 +85,7 @@ async function handlePing(monitorId, env, cors) {
   }
 
   const monitor = JSON.parse(monitorData);
+  const wasDown = monitor.status === "down";
   const now = Date.now();
 
   monitor.last_ping = now;
@@ -92,6 +93,11 @@ async function handlePing(monitorId, env, cors) {
   monitor.total_pings = (monitor.total_pings || 0) + 1;
 
   await env.KV.put(`monitor:${monitorId}`, JSON.stringify(monitor));
+
+  // Send recovery webhook if it was down
+  if (wasDown) {
+    await sendRecovery(monitor, { KV: env.KV });
+  }
 
   return json({ ok: true, monitor: monitor.name, received: new Date(now).toISOString() }, cors);
 }
@@ -175,11 +181,14 @@ async function handleCreateMonitor(request, authResult, env, cors) {
     return json({ error: "Send JSON." }, cors, 400);
   }
 
-  const { name, interval_minutes, alert_email } = body;
+  const { name, interval_minutes, alert_email, webhook_url } = body;
 
   if (!name) return json({ error: "'name' required." }, cors, 400);
   if (!interval_minutes || interval_minutes < 1) {
     return json({ error: "'interval_minutes' required (minimum 1)." }, cors, 400);
+  }
+  if (webhook_url && !webhook_url.startsWith("http")) {
+    return json({ error: "'webhook_url' must be a valid URL." }, cors, 400);
   }
 
   // Check monitor limit
@@ -199,8 +208,9 @@ async function handleCreateMonitor(request, authResult, env, cors) {
     name,
     interval_minutes: Number(interval_minutes),
     alert_email: alert_email || authResult.email,
+    webhook_url: webhook_url || null,
     owner: authResult.email,
-    status: "waiting", // hasn't pinged yet
+    status: "waiting",
     last_ping: null,
     last_alert: null,
     total_pings: 0,
@@ -311,26 +321,59 @@ async function checkAllMonitors(env) {
 // ---- SEND ALERT ----
 async function sendAlert(monitor, elapsedMs, env) {
   const minutesLate = Math.round(elapsedMs / 60000);
-  const email = monitor.alert_email || monitor.owner;
 
-  // Use Resend API (free tier: 3000 emails/month)
-  // For now, store alerts in KV so we can verify it works
-  // We'll add email delivery once we have a sending service
   const alert = {
     monitor_id: monitor.id,
     monitor_name: monitor.name,
-    alert_email: email,
+    status: "down",
     minutes_late: minutesLate,
-    timestamp: Date.now(),
-    message: `Your cron job "${monitor.name}" hasn't checked in for ${minutesLate} minutes. Expected every ${monitor.interval_minutes} minutes.`,
+    expected_interval: monitor.interval_minutes,
+    message: `"${monitor.name}" hasn't checked in for ${minutesLate} minutes. Expected every ${monitor.interval_minutes} minutes.`,
+    timestamp: new Date().toISOString(),
   };
 
-  // Store the alert
-  const alertKey = `alert:${monitor.id}:${Date.now()}`;
-  await env.KV.put(alertKey, JSON.stringify(alert), { expirationTtl: 86400 * 7 });
+  // Store alert in KV
+  await env.KV.put(
+    `alert:${monitor.id}:${Date.now()}`,
+    JSON.stringify(alert),
+    { expirationTtl: 86400 * 7 }
+  );
 
-  // TODO: Send actual email via Resend/MailChannels
-  console.log(`ALERT: ${alert.message} → ${email}`);
+  // Send webhook if configured
+  if (monitor.webhook_url) {
+    try {
+      await fetch(monitor.webhook_url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(alert),
+      });
+    } catch (e) {
+      console.log(`Webhook failed for ${monitor.id}: ${e.message}`);
+    }
+  }
+}
+
+// ---- RECOVERY ALERT (when a monitor comes back up) ----
+async function sendRecovery(monitor, env) {
+  const recovery = {
+    monitor_id: monitor.id,
+    monitor_name: monitor.name,
+    status: "up",
+    message: `"${monitor.name}" is back online.`,
+    timestamp: new Date().toISOString(),
+  };
+
+  if (monitor.webhook_url) {
+    try {
+      await fetch(monitor.webhook_url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(recovery),
+      });
+    } catch (e) {
+      console.log(`Recovery webhook failed for ${monitor.id}: ${e.message}`);
+    }
+  }
 }
 
 // ---- HELPERS ----
