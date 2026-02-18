@@ -5,293 +5,587 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gabe — Dead Simple Cron Monitoring</title>
   <meta name="description" content="Know when your cron jobs fail. Add one line to your crontab. Get alerts when jobs go silent. Free for up to 3 monitors.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: #0a0a0a;
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: #050505;
       color: #e5e5e5;
       line-height: 1.6;
+      overflow-x: hidden;
     }
     a { color: #22d3ee; text-decoration: none; }
     a:hover { text-decoration: underline; }
+    code, pre { font-family: 'JetBrains Mono', monospace; }
 
-    .container { max-width: 720px; margin: 0 auto; padding: 0 24px; }
+    .container { max-width: 800px; margin: 0 auto; padding: 0 24px; }
+
+    /* Animated background grid */
+    .bg-grid {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-image:
+        linear-gradient(rgba(34, 211, 238, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(34, 211, 238, 0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      z-index: -2;
+    }
+
+    /* Glow orb */
+    .glow {
+      position: fixed;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(34, 211, 238, 0.08) 0%, transparent 70%);
+      top: -200px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: -1;
+      animation: glowPulse 4s ease-in-out infinite;
+    }
+    @keyframes glowPulse {
+      0%, 100% { opacity: 0.6; transform: translateX(-50%) scale(1); }
+      50% { opacity: 1; transform: translateX(-50%) scale(1.1); }
+    }
 
     /* Nav */
     nav {
       padding: 20px 0;
-      border-bottom: 1px solid #1a1a1a;
+      position: relative;
+      z-index: 10;
     }
     nav .container {
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-    .logo { font-size: 20px; font-weight: 700; color: #fff; }
-    .nav-links a {
-      margin-left: 24px;
-      color: #999;
-      font-size: 14px;
+    .logo {
+      font-size: 22px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.5px;
     }
-    .nav-links a:hover { color: #fff; }
+    .logo .dot { color: #22d3ee; }
+    .nav-links a {
+      margin-left: 28px;
+      color: #666;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: #fff; text-decoration: none; }
 
     /* Hero */
     .hero {
-      padding: 80px 0 60px;
+      padding: 100px 0 40px;
       text-align: center;
-    }
-    .hero h1 {
-      font-size: 48px;
-      font-weight: 800;
-      color: #fff;
-      line-height: 1.1;
-      margin-bottom: 16px;
-    }
-    .hero h1 span { color: #22d3ee; }
-    .hero p {
-      font-size: 20px;
-      color: #999;
-      max-width: 500px;
-      margin: 0 auto 32px;
-    }
-    .hero-cta {
-      display: inline-block;
-      background: #22d3ee;
-      color: #0a0a0a;
-      padding: 14px 32px;
-      border-radius: 8px;
-      font-weight: 700;
-      font-size: 16px;
-      transition: opacity 0.2s;
-    }
-    .hero-cta:hover { opacity: 0.9; text-decoration: none; }
-    .hero-sub {
-      margin-top: 12px;
-      font-size: 14px;
-      color: #666;
+      position: relative;
     }
 
-    /* Code block */
-    .code-section {
-      padding: 40px 0;
+    /* Heartbeat SVG animation */
+    .heartbeat-line {
+      display: block;
+      margin: 0 auto 40px;
+      width: 100%;
+      max-width: 600px;
+      height: 80px;
     }
-    .code-section h2 {
-      text-align: center;
-      font-size: 14px;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      color: #666;
+    .heartbeat-path {
+      fill: none;
+      stroke: #22d3ee;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-dasharray: 800;
+      stroke-dashoffset: 800;
+      animation: drawHeartbeat 3s ease-in-out forwards, pulseGlow 3s ease-in-out infinite 3s;
+      filter: drop-shadow(0 0 8px rgba(34, 211, 238, 0.5));
+    }
+    .heartbeat-path-bg {
+      fill: none;
+      stroke: rgba(34, 211, 238, 0.1);
+      stroke-width: 2;
+      stroke-linecap: round;
+    }
+    @keyframes drawHeartbeat {
+      to { stroke-dashoffset: 0; }
+    }
+    @keyframes pulseGlow {
+      0%, 100% { filter: drop-shadow(0 0 8px rgba(34, 211, 238, 0.3)); }
+      50% { filter: drop-shadow(0 0 16px rgba(34, 211, 238, 0.8)); }
+    }
+
+    .hero h1 {
+      font-size: 56px;
+      font-weight: 900;
+      color: #fff;
+      line-height: 1.05;
       margin-bottom: 20px;
+      letter-spacing: -2px;
     }
-    pre {
-      background: #111;
-      border: 1px solid #222;
-      border-radius: 12px;
+    .hero h1 .highlight {
+      background: linear-gradient(135deg, #22d3ee, #818cf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero p {
+      font-size: 18px;
+      color: #888;
+      max-width: 460px;
+      margin: 0 auto 36px;
+      font-weight: 400;
+    }
+    .hero-buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 14px 28px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 15px;
+      transition: all 0.2s;
+      border: none;
+      cursor: pointer;
+    }
+    .btn:hover { text-decoration: none; }
+    .btn-primary {
+      background: linear-gradient(135deg, #22d3ee, #818cf8);
+      color: #050505;
+    }
+    .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-secondary {
+      background: rgba(255,255,255,0.06);
+      color: #e5e5e5;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .btn-secondary:hover { background: rgba(255,255,255,0.1); }
+    .hero-sub {
+      margin-top: 16px;
+      font-size: 13px;
+      color: #555;
+    }
+
+    /* Live terminal demo */
+    .terminal-section {
+      padding: 60px 0;
+    }
+    .terminal-section h2 {
+      text-align: center;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      color: #555;
+      margin-bottom: 24px;
+      font-weight: 600;
+    }
+    .terminal {
+      background: #0c0c0c;
+      border: 1px solid #1a1a1a;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.03);
+    }
+    .terminal-bar {
+      background: #141414;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    .terminal-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    .terminal-dot.red { background: #ff5f57; }
+    .terminal-dot.yellow { background: #febc2e; }
+    .terminal-dot.green { background: #28c840; }
+    .terminal-title {
+      flex: 1;
+      text-align: center;
+      font-size: 12px;
+      color: #555;
+      font-weight: 500;
+    }
+    .terminal-body {
       padding: 24px;
-      overflow-x: auto;
-      font-size: 14px;
-      line-height: 1.8;
+      font-size: 13px;
+      line-height: 2;
+      min-height: 260px;
     }
-    code { font-family: 'SF Mono', 'Fira Code', monospace; }
-    .comment { color: #555; }
-    .string { color: #22d3ee; }
-    .cmd { color: #e5e5e5; }
+    .term-line {
+      opacity: 0;
+      animation: termFadeIn 0.3s ease forwards;
+    }
+    .term-line:nth-child(1) { animation-delay: 0.5s; }
+    .term-line:nth-child(2) { animation-delay: 1.2s; }
+    .term-line:nth-child(3) { animation-delay: 1.6s; }
+    .term-line:nth-child(4) { animation-delay: 2.4s; }
+    .term-line:nth-child(5) { animation-delay: 3.0s; }
+    .term-line:nth-child(6) { animation-delay: 3.4s; }
+    .term-line:nth-child(7) { animation-delay: 4.0s; }
+    .term-line:nth-child(8) { animation-delay: 4.4s; }
+    .term-line:nth-child(9) { animation-delay: 5.0s; }
+    .term-line:nth-child(10) { animation-delay: 5.4s; }
+    @keyframes termFadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .term-prompt { color: #22d3ee; }
+    .term-cmd { color: #e5e5e5; }
+    .term-comment { color: #444; }
+    .term-success { color: #22c55e; }
+    .term-string { color: #c084fc; }
+    .term-dim { color: #555; }
+    .term-cursor {
+      display: inline-block;
+      width: 8px;
+      height: 16px;
+      background: #22d3ee;
+      vertical-align: middle;
+      animation: blink 1s step-end infinite;
+      margin-left: 2px;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    /* Status demo */
+    .status-section {
+      padding: 40px 0 60px;
+    }
+    .status-board {
+      background: #0c0c0c;
+      border: 1px solid #1a1a1a;
+      border-radius: 14px;
+      padding: 28px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    .status-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    .status-header h3 {
+      font-size: 14px;
+      color: #fff;
+      font-weight: 600;
+    }
+    .status-header span {
+      font-size: 12px;
+      color: #22c55e;
+      font-weight: 500;
+    }
+    .status-row {
+      display: flex;
+      align-items: center;
+      padding: 14px 0;
+      border-bottom: 1px solid #0f0f0f;
+    }
+    .status-row:last-child { border-bottom: none; }
+    .status-indicator {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 14px;
+      flex-shrink: 0;
+    }
+    .status-indicator.up {
+      background: #22c55e;
+      box-shadow: 0 0 8px rgba(34, 197, 94, 0.5);
+      animation: statusPulse 2s ease-in-out infinite;
+    }
+    .status-indicator.down {
+      background: #ef4444;
+      box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+      animation: statusPulse 1s ease-in-out infinite;
+    }
+    @keyframes statusPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    .status-name { flex: 1; font-size: 14px; color: #ccc; font-weight: 500; }
+    .status-meta { font-size: 12px; color: #555; text-align: right; }
+    .status-meta .time { display: block; }
 
     /* How it works */
     .how {
-      padding: 60px 0;
+      padding: 80px 0;
     }
     .how h2 {
-      font-size: 32px;
-      font-weight: 700;
+      font-size: 36px;
+      font-weight: 800;
       color: #fff;
       text-align: center;
-      margin-bottom: 40px;
+      margin-bottom: 12px;
+      letter-spacing: -1px;
+    }
+    .how .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 16px;
+      margin-bottom: 48px;
     }
     .steps {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 24px;
+      gap: 20px;
     }
     .step {
-      background: #111;
-      border: 1px solid #222;
-      border-radius: 12px;
-      padding: 24px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px;
+      padding: 28px;
+      transition: border-color 0.3s;
     }
-    .step-num {
-      display: inline-block;
-      width: 32px;
-      height: 32px;
-      background: #22d3ee;
-      color: #0a0a0a;
-      border-radius: 50%;
-      text-align: center;
-      line-height: 32px;
-      font-weight: 700;
-      font-size: 14px;
-      margin-bottom: 12px;
+    .step:hover { border-color: rgba(34, 211, 238, 0.3); }
+    .step-icon {
+      font-size: 28px;
+      margin-bottom: 16px;
+      display: block;
     }
-    .step h3 { color: #fff; font-size: 18px; margin-bottom: 8px; }
-    .step p { color: #888; font-size: 14px; }
+    .step h3 { color: #fff; font-size: 17px; margin-bottom: 8px; font-weight: 700; }
+    .step p { color: #777; font-size: 14px; line-height: 1.6; }
 
     /* Pricing */
     .pricing {
-      padding: 60px 0;
+      padding: 80px 0;
     }
     .pricing h2 {
-      font-size: 32px;
-      font-weight: 700;
+      font-size: 36px;
+      font-weight: 800;
       color: #fff;
       text-align: center;
-      margin-bottom: 40px;
+      margin-bottom: 12px;
+      letter-spacing: -1px;
+    }
+    .pricing .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 16px;
+      margin-bottom: 48px;
     }
     .plans {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 24px;
+      gap: 20px;
     }
     .plan {
-      background: #111;
-      border: 1px solid #222;
-      border-radius: 12px;
-      padding: 32px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px;
+      padding: 36px;
     }
     .plan.featured {
-      border-color: #22d3ee;
+      border-color: rgba(34, 211, 238, 0.4);
+      background: linear-gradient(135deg, rgba(34, 211, 238, 0.05), rgba(129, 140, 248, 0.03));
+      position: relative;
     }
-    .plan-name { font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: #666; }
-    .plan-price { font-size: 48px; font-weight: 800; color: #fff; margin: 8px 0; }
-    .plan-price span { font-size: 18px; color: #666; font-weight: 400; }
+    .plan.featured::before {
+      content: "POPULAR";
+      position: absolute;
+      top: -10px;
+      right: 20px;
+      background: linear-gradient(135deg, #22d3ee, #818cf8);
+      color: #050505;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 6px;
+      letter-spacing: 1px;
+    }
+    .plan-name { font-size: 13px; text-transform: uppercase; letter-spacing: 1.5px; color: #666; font-weight: 600; }
+    .plan-price { font-size: 52px; font-weight: 900; color: #fff; margin: 8px 0 4px; letter-spacing: -2px; }
+    .plan-price span { font-size: 16px; color: #555; font-weight: 400; letter-spacing: 0; }
+    .plan-desc { color: #555; font-size: 13px; margin-bottom: 20px; }
     .plan ul { list-style: none; margin: 20px 0; }
     .plan li {
-      padding: 6px 0;
-      color: #999;
-      font-size: 15px;
+      padding: 8px 0;
+      color: #aaa;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
-    .plan li::before {
-      content: "\2713";
-      color: #22d3ee;
-      margin-right: 8px;
-      font-weight: 700;
+    .check {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: rgba(34, 211, 238, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
     }
+    .check svg { width: 10px; height: 10px; }
     .plan-btn {
       display: block;
       text-align: center;
-      padding: 12px;
-      border-radius: 8px;
+      padding: 14px;
+      border-radius: 10px;
       font-weight: 600;
       font-size: 15px;
-      margin-top: 20px;
+      margin-top: 24px;
+      transition: all 0.2s;
     }
+    .plan-btn:hover { text-decoration: none; transform: translateY(-1px); }
     .plan-btn.primary {
-      background: #22d3ee;
-      color: #0a0a0a;
+      background: linear-gradient(135deg, #22d3ee, #818cf8);
+      color: #050505;
     }
     .plan-btn.secondary {
-      background: #1a1a1a;
+      background: rgba(255,255,255,0.05);
       color: #e5e5e5;
-      border: 1px solid #333;
+      border: 1px solid rgba(255,255,255,0.1);
     }
-
-    /* Comparison */
-    .compare {
-      padding: 40px 0;
-      text-align: center;
-    }
-    .compare p {
-      color: #666;
-      font-size: 14px;
-    }
-    .compare table {
-      margin: 20px auto;
-      border-collapse: collapse;
-      font-size: 14px;
-    }
-    .compare th, .compare td {
-      padding: 8px 20px;
-      text-align: left;
-      border-bottom: 1px solid #1a1a1a;
-    }
-    .compare th { color: #fff; }
-    .compare td { color: #888; }
 
     /* Footer */
     footer {
-      padding: 40px 0;
-      border-top: 1px solid #1a1a1a;
+      padding: 48px 0;
+      border-top: 1px solid rgba(255,255,255,0.05);
       text-align: center;
-      color: #555;
+      color: #444;
       font-size: 13px;
     }
+    footer a { color: #666; }
 
     /* Responsive */
     @media (max-width: 640px) {
-      .hero h1 { font-size: 32px; }
+      .hero h1 { font-size: 36px; letter-spacing: -1px; }
       .steps { grid-template-columns: 1fr; }
       .plans { grid-template-columns: 1fr; }
+      .terminal-body { font-size: 11px; padding: 16px; }
     }
   </style>
 </head>
 <body>
 
+  <div class="bg-grid"></div>
+  <div class="glow"></div>
+
   <nav>
     <div class="container">
-      <div class="logo">gabe</div>
+      <div class="logo">gabe<span class="dot">.</span></div>
       <div class="nav-links">
         <a href="#how">How it works</a>
         <a href="#pricing">Pricing</a>
-        <a href="https://gabe.usegabe.workers.dev/" target="_blank">API Docs</a>
+        <a href="#docs">Docs</a>
+        <a href="https://github.com/Scolliq/gabe" target="_blank">GitHub</a>
       </div>
     </div>
   </nav>
 
   <section class="hero">
     <div class="container">
-      <h1>Know when your<br><span>cron jobs fail.</span></h1>
-      <p>Add one line to your crontab. Get an alert when a job goes silent. That's it.</p>
-      <a href="#pricing" class="hero-cta">Start for free</a>
-      <p class="hero-sub">Free for up to 3 monitors. No credit card.</p>
+      <!-- Heartbeat SVG animation -->
+      <svg class="heartbeat-line" viewBox="0 0 600 80" preserveAspectRatio="none">
+        <path class="heartbeat-path-bg" d="M0,40 L150,40 L170,40 L185,10 L200,70 L215,20 L230,50 L245,40 L400,40 L420,40 L435,10 L450,70 L465,20 L480,50 L495,40 L600,40"/>
+        <path class="heartbeat-path" d="M0,40 L150,40 L170,40 L185,10 L200,70 L215,20 L230,50 L245,40 L400,40 L420,40 L435,10 L450,70 L465,20 L480,50 L495,40 L600,40"/>
+      </svg>
+
+      <h1>Know when your<br>cron jobs <span class="highlight">go silent.</span></h1>
+      <p>One curl at the end of your crontab. If it stops, you'll know in minutes.</p>
+      <div class="hero-buttons">
+        <a href="#pricing" class="btn btn-primary">Start monitoring — free</a>
+        <a href="#docs" class="btn btn-secondary">See the API</a>
+      </div>
+      <p class="hero-sub">3 free monitors. No credit card. Setup in 30 seconds.</p>
     </div>
   </section>
 
-  <section class="code-section">
+  <!-- Animated terminal -->
+  <section class="terminal-section">
     <div class="container">
       <h2>Setup in 30 seconds</h2>
-      <pre><code><span class="comment"># 1. Sign up (one time)</span>
-<span class="cmd">curl -X POST</span> <span class="string">https://gabe.usegabe.workers.dev/api/signup</span> \
-  <span class="cmd">-H</span> <span class="string">"Content-Type: application/json"</span> \
-  <span class="cmd">-d</span> <span class="string">'{"email":"you@example.com"}'</span>
+      <div class="terminal">
+        <div class="terminal-bar">
+          <div class="terminal-dot red"></div>
+          <div class="terminal-dot yellow"></div>
+          <div class="terminal-dot green"></div>
+          <div class="terminal-title">Terminal</div>
+          <div style="width: 36px;"></div>
+        </div>
+        <div class="terminal-body">
+          <div class="term-line"><span class="term-comment"># Sign up and get your API key</span></div>
+          <div class="term-line"><span class="term-prompt">$ </span><span class="term-cmd">curl -X POST gabe.usegabe.workers.dev/api/signup \</span></div>
+          <div class="term-line"><span class="term-dim">    -d </span><span class="term-string">'{"email":"dev@myapp.com"}'</span></div>
+          <div class="term-line"><span class="term-success">  {"api_key": "gabe_k8x2m...", "monitors": 3}</span></div>
+          <div class="term-line">&nbsp;</div>
+          <div class="term-line"><span class="term-comment"># Create a monitor for your backup job</span></div>
+          <div class="term-line"><span class="term-prompt">$ </span><span class="term-cmd">curl -X POST gabe.usegabe.workers.dev/api/monitors \</span></div>
+          <div class="term-line"><span class="term-dim">    -H </span><span class="term-string">"Authorization: Bearer gabe_k8x2m..."</span><span class="term-dim"> \</span></div>
+          <div class="term-line"><span class="term-dim">    -d </span><span class="term-string">'{"name":"DB backup","interval_minutes":60}'</span></div>
+          <div class="term-line"><span class="term-success">  {"ping_url": "gabe.usegabe.workers.dev/ping/a3f8x1"}</span><span class="term-cursor"></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-<span class="comment"># 2. Create a monitor (one time)</span>
-<span class="cmd">curl -X POST</span> <span class="string">https://gabe.usegabe.workers.dev/api/monitors</span> \
-  <span class="cmd">-H</span> <span class="string">"Authorization: Bearer YOUR_API_KEY"</span> \
-  <span class="cmd">-d</span> <span class="string">'{"name":"Nightly backup","interval_minutes":60}'</span>
-
-<span class="comment"># 3. Add to your crontab (done forever)</span>
-<span class="cmd">0 * * * *</span> <span class="string">/usr/bin/backup.sh && curl -fsS gabe.usegabe.workers.dev/ping/YOUR_ID</span></code></pre>
+  <!-- Live status demo -->
+  <section class="status-section">
+    <div class="container">
+      <div class="status-board">
+        <div class="status-header">
+          <h3>Your monitors</h3>
+          <span>All systems operational</span>
+        </div>
+        <div class="status-row">
+          <div class="status-indicator up"></div>
+          <div class="status-name">Database backup</div>
+          <div class="status-meta">
+            <span class="time">Pinged 12 min ago</span>
+          </div>
+        </div>
+        <div class="status-row">
+          <div class="status-indicator up"></div>
+          <div class="status-name">Invoice generator</div>
+          <div class="status-meta">
+            <span class="time">Pinged 3 min ago</span>
+          </div>
+        </div>
+        <div class="status-row">
+          <div class="status-indicator down"></div>
+          <div class="status-name">Email digest</div>
+          <div class="status-meta">
+            <span class="time" style="color:#ef4444;">Late — 47 min</span>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
   <section class="how" id="how">
     <div class="container">
-      <h2>How it works</h2>
+      <h2>Three steps. That's it.</h2>
+      <p class="subtitle">No SDK. No dashboard required. Just curl.</p>
       <div class="steps">
         <div class="step">
-          <div class="step-num">1</div>
+          <span class="step-icon">&#9678;</span>
           <h3>Create a monitor</h3>
-          <p>Tell Gabe what job to watch and how often it should run. Get a unique ping URL.</p>
+          <p>Tell Gabe your job's name and how often it runs. You get a unique ping URL back.</p>
         </div>
         <div class="step">
-          <div class="step-num">2</div>
-          <h3>Add the ping</h3>
-          <p>Append <code>curl gabe.usegabe.workers.dev/ping/ID</code> to the end of your cron job.</p>
+          <span class="step-icon">&#10095;</span>
+          <h3>Add one line</h3>
+          <p>Append <code style="background:#111;padding:2px 6px;border-radius:4px;font-size:12px;">curl gabe.usegabe.workers.dev/ping/ID</code> to the end of your cron job. Done.</p>
         </div>
         <div class="step">
-          <div class="step-num">3</div>
-          <h3>Get alerts</h3>
-          <p>If your job doesn't ping on time, Gabe emails you immediately. No noise, just the alert.</p>
+          <span class="step-icon">&#9889;</span>
+          <h3>Get alerted</h3>
+          <p>If your job misses its window, Gabe emails you immediately. No noise. Just the signal.</p>
         </div>
       </div>
     </div>
@@ -299,75 +593,93 @@
 
   <section class="pricing" id="pricing">
     <div class="container">
-      <h2>Simple pricing</h2>
+      <h2>Simple, honest pricing.</h2>
+      <p class="subtitle">Cheaper than finding out your backup script died 3 weeks ago.</p>
       <div class="plans">
         <div class="plan">
           <div class="plan-name">Free</div>
           <div class="plan-price">$0 <span>/mo</span></div>
+          <p class="plan-desc">For side projects and personal servers.</p>
           <ul>
-            <li>3 monitors</li>
-            <li>2-minute check interval</li>
-            <li>Email alerts</li>
-            <li>Forever free</li>
+            <li><span class="check"><svg viewBox="0 0 10 10"><path d="M1.5 5 L4 7.5 L8.5 2.5" stroke="#22d3ee" fill="none" stroke-width="1.5"/></svg></span> 3 monitors</li>
+            <li><span class="check"><svg viewBox="0 0 10 10"><path d="M1.5 5 L4 7.5 L8.5 2.5" stroke="#22d3ee" fill="none" stroke-width="1.5"/></svg></span> 2-minute check interval</li>
+            <li><span class="check"><svg viewBox="0 0 10 10"><path d="M1.5 5 L4 7.5 L8.5 2.5" stroke="#22d3ee" fill="none" stroke-width="1.5"/></svg></span> Email alerts</li>
+            <li><span class="check"><svg viewBox="0 0 10 10"><path d="M1.5 5 L4 7.5 L8.5 2.5" stroke="#22d3ee" fill="none" stroke-width="1.5"/></svg></span> Forever free</li>
           </ul>
           <a href="https://gabe.usegabe.workers.dev/api/signup" class="plan-btn secondary">Get started</a>
         </div>
         <div class="plan featured">
           <div class="plan-name">Pro</div>
           <div class="plan-price">$4 <span>/mo</span></div>
+          <p class="plan-desc">For teams and production workloads.</p>
           <ul>
-            <li>20 monitors</li>
-            <li>1-minute check interval</li>
-            <li>Email + Slack alerts</li>
-            <li>Priority support</li>
+            <li><span class="check"><svg viewBox="0 0 10 10"><path d="M1.5 5 L4 7.5 L8.5 2.5" stroke="#22d3ee" fill="none" stroke-width="1.5"/></svg></span> 20 monitors</li>
+            <li><span class="check"><svg viewBox="0 0 10 10"><path d="M1.5 5 L4 7.5 L8.5 2.5" stroke="#22d3ee" fill="none" stroke-width="1.5"/></svg></span> 1-minute check interval</li>
+            <li><span class="check"><svg viewBox="0 0 10 10"><path d="M1.5 5 L4 7.5 L8.5 2.5" stroke="#22d3ee" fill="none" stroke-width="1.5"/></svg></span> Email + Slack alerts</li>
+            <li><span class="check"><svg viewBox="0 0 10 10"><path d="M1.5 5 L4 7.5 L8.5 2.5" stroke="#22d3ee" fill="none" stroke-width="1.5"/></svg></span> Priority support</li>
           </ul>
-          <a href="https://buy.stripe.com/test_28E6oI8VM6m26wB1Js7ok00" class="plan-btn primary" id="pro-btn">Upgrade to Pro</a>
+          <a href="https://buy.stripe.com/test_28E6oI8VM6m26wB1Js7ok00" class="plan-btn primary">Upgrade to Pro</a>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="compare">
+  <!-- API Docs -->
+  <section id="docs" style="padding: 80px 0;">
     <div class="container">
-      <p>Why Gabe over the alternatives?</p>
-      <table>
-        <tr>
-          <th></th>
-          <th>Gabe</th>
-          <th>Healthchecks.io</th>
-          <th>Cronitor</th>
-        </tr>
-        <tr>
-          <td>Free monitors</td>
-          <td>3</td>
-          <td>20</td>
-          <td>1</td>
-        </tr>
-        <tr>
-          <td>Paid plan</td>
-          <td>$4/mo</td>
-          <td>$17/mo</td>
-          <td>$13/mo</td>
-        </tr>
-        <tr>
-          <td>Setup time</td>
-          <td>30 seconds</td>
-          <td>5 minutes</td>
-          <td>5 minutes</td>
-        </tr>
-        <tr>
-          <td>No dashboard required</td>
-          <td>Yes</td>
-          <td>No</td>
-          <td>No</td>
-        </tr>
-      </table>
+      <h2 style="font-size:36px;font-weight:800;color:#fff;text-align:center;margin-bottom:12px;letter-spacing:-1px;">API Reference</h2>
+      <p style="text-align:center;color:#666;font-size:16px;margin-bottom:40px;">Base URL: <code style="background:#111;padding:4px 10px;border-radius:6px;font-size:14px;color:#22d3ee;">https://gabe.usegabe.workers.dev</code></p>
+
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div style="background:#0c0c0c;border:1px solid #1a1a1a;border-radius:12px;padding:24px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+            <span style="background:#22c55e;color:#050505;font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;">POST</span>
+            <code style="color:#fff;font-size:14px;">/api/signup</code>
+          </div>
+          <p style="color:#777;font-size:13px;margin-bottom:8px;">Create an account and get your API key.</p>
+          <code style="font-size:12px;color:#555;">Body: {"email": "you@example.com"}</code>
+        </div>
+
+        <div style="background:#0c0c0c;border:1px solid #1a1a1a;border-radius:12px;padding:24px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+            <span style="background:#22c55e;color:#050505;font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;">POST</span>
+            <code style="color:#fff;font-size:14px;">/api/monitors</code>
+          </div>
+          <p style="color:#777;font-size:13px;margin-bottom:8px;">Create a new monitor. Returns a ping URL.</p>
+          <code style="font-size:12px;color:#555;">Body: {"name": "My job", "interval_minutes": 60}</code>
+        </div>
+
+        <div style="background:#0c0c0c;border:1px solid #1a1a1a;border-radius:12px;padding:24px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+            <span style="background:#3b82f6;color:#fff;font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;">GET</span>
+            <code style="color:#fff;font-size:14px;">/ping/:id</code>
+          </div>
+          <p style="color:#777;font-size:13px;">Send a heartbeat. Add this to the end of your cron job.</p>
+        </div>
+
+        <div style="background:#0c0c0c;border:1px solid #1a1a1a;border-radius:12px;padding:24px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+            <span style="background:#3b82f6;color:#fff;font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;">GET</span>
+            <code style="color:#fff;font-size:14px;">/api/monitors</code>
+          </div>
+          <p style="color:#777;font-size:13px;">List all your monitors and their current status.</p>
+        </div>
+
+        <div style="background:#0c0c0c;border:1px solid #1a1a1a;border-radius:12px;padding:24px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+            <span style="background:#ef4444;color:#fff;font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;">DELETE</span>
+            <code style="color:#fff;font-size:14px;">/api/monitors/:id</code>
+          </div>
+          <p style="color:#777;font-size:13px;">Delete a monitor.</p>
+        </div>
+      </div>
     </div>
   </section>
 
   <footer>
     <div class="container">
-      <p>Gabe &mdash; Dead simple cron monitoring. Built by <a href="https://github.com/Scolliq">useGabe</a>.</p>
+      <p>gabe<span style="color:#22d3ee;">.</span> &mdash; Dead simple cron monitoring.</p>
+      <p style="margin-top:8px;"><a href="https://github.com/Scolliq/gabe">GitHub</a> &nbsp;&middot;&nbsp; <a href="https://gabe.usegabe.workers.dev/">API</a></p>
     </div>
   </footer>
 
