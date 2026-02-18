@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <!-- Background rounded square -->
+  <rect x="16" y="16" width="480" height="480" rx="96" fill="#0c0c0f"/>
+
+  <!-- Soft ambient glow -->
+  <circle cx="256" cy="220" r="160" fill="#22d3ee" opacity="0.04"/>
+
+  <!-- Head - rounder, more blob-like, Claude-inspired -->
+  <path d="M160 260 C160 172 196 140 256 140 C316 140 352 172 352 260 C352 310 316 340 256 340 C196 340 160 310 160 260Z" fill="#fafafa"/>
+
+  <!-- Eyes - sleepy/relaxed dashes -->
+  <line x1="208" y1="240" x2="236" y2="240" stroke="#0c0c0f" stroke-width="8" stroke-linecap="round"/>
+  <line x1="276" y1="240" x2="304" y2="240" stroke="#0c0c0f" stroke-width="8" stroke-linecap="round"/>
+
+  <!-- Tiny content smile -->
+  <path d="M240 272 Q256 284 272 272" stroke="#0c0c0f" stroke-width="5" stroke-linecap="round" fill="none"/>
+
+  <!-- Blush marks -->
+  <circle cx="200" cy="262" r="12" fill="#22d3ee" opacity="0.2"/>
+  <circle cx="312" cy="262" r="12" fill="#22d3ee" opacity="0.2"/>
+
+  <!-- Heartbeat line underneath -->
+  <path d="M64 400 L168 400 L192 400 L212 368 L232 432 L252 360 L272 408 L292 400 L448 400"
+        stroke="#22d3ee" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M64 400 L168 400 L192 400 L212 368 L232 432 L252 360 L272 408 L292 400 L448 400"
+        stroke="#22d3ee" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.1"/>
+</svg>

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <!-- Background circle -->
+  <circle cx="256" cy="256" r="240" fill="#0c0c0f"/>
+
+  <!-- Main body - soft rounded blob shape like Claude -->
+  <ellipse cx="256" cy="270" rx="140" ry="130" fill="#22d3ee" opacity="0.12"/>
+  <ellipse cx="256" cy="270" rx="120" ry="112" fill="#22d3ee" opacity="0.15"/>
+
+  <!-- Face/head - friendly rounded shape -->
+  <circle cx="256" cy="240" r="96" fill="#fafafa"/>
+
+  <!-- Eyes - relaxed, slightly closed, friendly -->
+  <path d="M210 230 Q220 220 230 230" stroke="#0c0c0f" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M282 230 Q292 220 302 230" stroke="#0c0c0f" stroke-width="8" stroke-linecap="round" fill="none"/>
+
+  <!-- Small relaxed smile -->
+  <path d="M236 262 Q256 278 276 262" stroke="#0c0c0f" stroke-width="6" stroke-linecap="round" fill="none"/>
+
+  <!-- Heartbeat line going through the bottom - the signature element -->
+  <path d="M80 370 L180 370 L200 370 L218 340 L236 400 L254 330 L272 380 L290 370 L432 370"
+        stroke="#22d3ee" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+
+  <!-- Subtle glow on the heartbeat -->
+  <path d="M80 370 L180 370 L200 370 L218 340 L236 400 L254 330 L272 380 L290 370 L432 370"
+        stroke="#22d3ee" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.15"/>
+</svg>
