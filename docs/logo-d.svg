@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <!--
+    Gabe logo D — organic 4-point spark with pulse personality
+    Most Claude-like: soft, rounded, organic curves
+  -->
+  <path d="
+    M256 48
+    C270 160 288 200 316 228
+    C340 212 400 206 464 256
+    C400 306 340 300 316 284
+    C288 312 270 352 256 464
+    C242 352 224 312 196 284
+    C172 300 112 306 48 256
+    C112 206 172 212 196 228
+    C224 200 242 160 256 48Z
+  " fill="#22d3ee"/>
+</svg>

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <!--
+    Gabe logo C — minimal organic asterisk
+    Smooth tapered arms, very close to Claude's style
+  -->
+  <!-- Center dot -->
+  <circle cx="256" cy="256" r="32" fill="#22d3ee"/>
+
+  <!-- Six organic arms -->
+  <!-- Top -->
+  <path d="M244 224 Q248 140 256 60 Q264 140 268 224Z" fill="#22d3ee"/>
+  <!-- Top right -->
+  <path d="M276 236 Q340 188 412 120 Q320 200 284 252Z" fill="#22d3ee"/>
+  <!-- Bottom right -->
+  <path d="M284 268 Q340 320 412 392 Q320 310 276 276Z" fill="#22d3ee"/>
+  <!-- Bottom -->
+  <path d="M268 288 Q264 372 256 452 Q248 372 244 288Z" fill="#22d3ee"/>
+  <!-- Bottom left -->
+  <path d="M228 276 Q172 320 100 392 Q192 310 236 268Z" fill="#22d3ee"/>
+  <!-- Top left -->
+  <path d="M236 236 Q172 188 100 120 Q192 200 228 252Z" fill="#22d3ee"/>
+</svg>

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <!--
+    Gabe logo B — cleaner organic sparkle
+    Six soft arms radiating from center, Claude-style
+  -->
+  <path d="
+    M256 40
+    C262 140 272 180 256 200
+    C280 180 320 170 472 196
+    C370 210 310 230 280 240
+    C310 250 330 280 460 400
+    C370 360 320 320 280 300
+    C290 330 272 370 256 472
+    C252 370 242 330 232 300
+    C200 320 150 360 52 400
+    C170 280 210 250 232 240
+    C210 230 150 210 40 196
+    C190 170 240 180 256 200
+    C252 180 250 140 256 40Z
+  " fill="#22d3ee"/>
+</svg>
