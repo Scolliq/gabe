@@ -100,7 +100,7 @@
       stroke-linecap: round;
       stroke-dasharray: 800;
       stroke-dashoffset: 800;
-      animation: drawHeartbeat 3s ease-in-out forwards, pulseGlow 3s ease-in-out infinite 3s;
+      animation: drawHeartbeat 2s ease-in-out infinite;
       filter: drop-shadow(0 0 8px rgba(34, 211, 238, 0.5));
     }
     .heartbeat-path-bg {
@@ -110,11 +110,9 @@
       stroke-linecap: round;
     }
     @keyframes drawHeartbeat {
-      to { stroke-dashoffset: 0; }
-    }
-    @keyframes pulseGlow {
-      0%, 100% { filter: drop-shadow(0 0 8px rgba(34, 211, 238, 0.3)); }
-      50% { filter: drop-shadow(0 0 16px rgba(34, 211, 238, 0.8)); }
+      0% { stroke-dashoffset: 800; filter: drop-shadow(0 0 6px rgba(34, 211, 238, 0.3)); }
+      50% { stroke-dashoffset: 0; filter: drop-shadow(0 0 16px rgba(34, 211, 238, 0.8)); }
+      100% { stroke-dashoffset: -800; filter: drop-shadow(0 0 6px rgba(34, 211, 238, 0.3)); }
     }
 
     .hero h1 {
