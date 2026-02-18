@@ -1,0 +1,12 @@
+name = "gabe"
+main = "src/index.js"
+compatibility_date = "2024-01-01"
+
+# Cron trigger - check monitors every 2 minutes
+[triggers]
+crons = ["*/2 * * * *"]
+
+# KV for monitors, pings, users
+[[kv_namespaces]]
+binding = "KV"
+id = "70a2ad8b945141f1b4e5b850e9a09f4e"

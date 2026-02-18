@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gabe — Dead Simple Cron Monitoring</title>
+  <meta name="description" content="Know when your cron jobs fail. Add one line to your crontab. Get alerts when jobs go silent. Free for up to 3 monitors.">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0a0a0a;
+      color: #e5e5e5;
+      line-height: 1.6;
+    }
+    a { color: #22d3ee; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .container { max-width: 720px; margin: 0 auto; padding: 0 24px; }
+
+    /* Nav */
+    nav {
+      padding: 20px 0;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    nav .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo { font-size: 20px; font-weight: 700; color: #fff; }
+    .nav-links a {
+      margin-left: 24px;
+      color: #999;
+      font-size: 14px;
+    }
+    .nav-links a:hover { color: #fff; }
+
+    /* Hero */
+    .hero {
+      padding: 80px 0 60px;
+      text-align: center;
+    }
+    .hero h1 {
+      font-size: 48px;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.1;
+      margin-bottom: 16px;
+    }
+    .hero h1 span { color: #22d3ee; }
+    .hero p {
+      font-size: 20px;
+      color: #999;
+      max-width: 500px;
+      margin: 0 auto 32px;
+    }
+    .hero-cta {
+      display: inline-block;
+      background: #22d3ee;
+      color: #0a0a0a;
+      padding: 14px 32px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 16px;
+      transition: opacity 0.2s;
+    }
+    .hero-cta:hover { opacity: 0.9; text-decoration: none; }
+    .hero-sub {
+      margin-top: 12px;
+      font-size: 14px;
+      color: #666;
+    }
+
+    /* Code block */
+    .code-section {
+      padding: 40px 0;
+    }
+    .code-section h2 {
+      text-align: center;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #666;
+      margin-bottom: 20px;
+    }
+    pre {
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 12px;
+      padding: 24px;
+      overflow-x: auto;
+      font-size: 14px;
+      line-height: 1.8;
+    }
+    code { font-family: 'SF Mono', 'Fira Code', monospace; }
+    .comment { color: #555; }
+    .string { color: #22d3ee; }
+    .cmd { color: #e5e5e5; }
+
+    /* How it works */
+    .how {
+      padding: 60px 0;
+    }
+    .how h2 {
+      font-size: 32px;
+      font-weight: 700;
+      color: #fff;
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .step {
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 12px;
+      padding: 24px;
+    }
+    .step-num {
+      display: inline-block;
+      width: 32px;
+      height: 32px;
+      background: #22d3ee;
+      color: #0a0a0a;
+      border-radius: 50%;
+      text-align: center;
+      line-height: 32px;
+      font-weight: 700;
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+    .step h3 { color: #fff; font-size: 18px; margin-bottom: 8px; }
+    .step p { color: #888; font-size: 14px; }
+
+    /* Pricing */
+    .pricing {
+      padding: 60px 0;
+    }
+    .pricing h2 {
+      font-size: 32px;
+      font-weight: 700;
+      color: #fff;
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .plans {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    .plan {
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 12px;
+      padding: 32px;
+    }
+    .plan.featured {
+      border-color: #22d3ee;
+    }
+    .plan-name { font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: #666; }
+    .plan-price { font-size: 48px; font-weight: 800; color: #fff; margin: 8px 0; }
+    .plan-price span { font-size: 18px; color: #666; font-weight: 400; }
+    .plan ul { list-style: none; margin: 20px 0; }
+    .plan li {
+      padding: 6px 0;
+      color: #999;
+      font-size: 15px;
+    }
+    .plan li::before {
+      content: "\2713";
+      color: #22d3ee;
+      margin-right: 8px;
+      font-weight: 700;
+    }
+    .plan-btn {
+      display: block;
+      text-align: center;
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 15px;
+      margin-top: 20px;
+    }
+    .plan-btn.primary {
+      background: #22d3ee;
+      color: #0a0a0a;
+    }
+    .plan-btn.secondary {
+      background: #1a1a1a;
+      color: #e5e5e5;
+      border: 1px solid #333;
+    }
+
+    /* Comparison */
+    .compare {
+      padding: 40px 0;
+      text-align: center;
+    }
+    .compare p {
+      color: #666;
+      font-size: 14px;
+    }
+    .compare table {
+      margin: 20px auto;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    .compare th, .compare td {
+      padding: 8px 20px;
+      text-align: left;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    .compare th { color: #fff; }
+    .compare td { color: #888; }
+
+    /* Footer */
+    footer {
+      padding: 40px 0;
+      border-top: 1px solid #1a1a1a;
+      text-align: center;
+      color: #555;
+      font-size: 13px;
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .hero h1 { font-size: 32px; }
+      .steps { grid-template-columns: 1fr; }
+      .plans { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="container">
+      <div class="logo">gabe</div>
+      <div class="nav-links">
+        <a href="#how">How it works</a>
+        <a href="#pricing">Pricing</a>
+        <a href="https://gabe.usegabe.workers.dev/" target="_blank">API Docs</a>
+      </div>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="container">
+      <h1>Know when your<br><span>cron jobs fail.</span></h1>
+      <p>Add one line to your crontab. Get an alert when a job goes silent. That's it.</p>
+      <a href="#pricing" class="hero-cta">Start for free</a>
+      <p class="hero-sub">Free for up to 3 monitors. No credit card.</p>
+    </div>
+  </section>
+
+  <section class="code-section">
+    <div class="container">
+      <h2>Setup in 30 seconds</h2>
+      <pre><code><span class="comment"># 1. Sign up (one time)</span>
+<span class="cmd">curl -X POST</span> <span class="string">https://gabe.usegabe.workers.dev/api/signup</span> \
+  <span class="cmd">-H</span> <span class="string">"Content-Type: application/json"</span> \
+  <span class="cmd">-d</span> <span class="string">'{"email":"you@example.com"}'</span>
+
+<span class="comment"># 2. Create a monitor (one time)</span>
+<span class="cmd">curl -X POST</span> <span class="string">https://gabe.usegabe.workers.dev/api/monitors</span> \
+  <span class="cmd">-H</span> <span class="string">"Authorization: Bearer YOUR_API_KEY"</span> \
+  <span class="cmd">-d</span> <span class="string">'{"name":"Nightly backup","interval_minutes":60}'</span>
+
+<span class="comment"># 3. Add to your crontab (done forever)</span>
+<span class="cmd">0 * * * *</span> <span class="string">/usr/bin/backup.sh && curl -fsS gabe.usegabe.workers.dev/ping/YOUR_ID</span></code></pre>
+    </div>
+  </section>
+
+  <section class="how" id="how">
+    <div class="container">
+      <h2>How it works</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <h3>Create a monitor</h3>
+          <p>Tell Gabe what job to watch and how often it should run. Get a unique ping URL.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <h3>Add the ping</h3>
+          <p>Append <code>curl gabe.usegabe.workers.dev/ping/ID</code> to the end of your cron job.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <h3>Get alerts</h3>
+          <p>If your job doesn't ping on time, Gabe emails you immediately. No noise, just the alert.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="pricing" id="pricing">
+    <div class="container">
+      <h2>Simple pricing</h2>
+      <div class="plans">
+        <div class="plan">
+          <div class="plan-name">Free</div>
+          <div class="plan-price">$0 <span>/mo</span></div>
+          <ul>
+            <li>3 monitors</li>
+            <li>2-minute check interval</li>
+            <li>Email alerts</li>
+            <li>Forever free</li>
+          </ul>
+          <a href="https://gabe.usegabe.workers.dev/api/signup" class="plan-btn secondary">Get started</a>
+        </div>
+        <div class="plan featured">
+          <div class="plan-name">Pro</div>
+          <div class="plan-price">$4 <span>/mo</span></div>
+          <ul>
+            <li>20 monitors</li>
+            <li>1-minute check interval</li>
+            <li>Email + Slack alerts</li>
+            <li>Priority support</li>
+          </ul>
+          <a href="#" class="plan-btn primary" id="pro-btn">Upgrade to Pro</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="compare">
+    <div class="container">
+      <p>Why Gabe over the alternatives?</p>
+      <table>
+        <tr>
+          <th></th>
+          <th>Gabe</th>
+          <th>Healthchecks.io</th>
+          <th>Cronitor</th>
+        </tr>
+        <tr>
+          <td>Free monitors</td>
+          <td>3</td>
+          <td>20</td>
+          <td>1</td>
+        </tr>
+        <tr>
+          <td>Paid plan</td>
+          <td>$4/mo</td>
+          <td>$17/mo</td>
+          <td>$13/mo</td>
+        </tr>
+        <tr>
+          <td>Setup time</td>
+          <td>30 seconds</td>
+          <td>5 minutes</td>
+          <td>5 minutes</td>
+        </tr>
+        <tr>
+          <td>No dashboard required</td>
+          <td>Yes</td>
+          <td>No</td>
+          <td>No</td>
+        </tr>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>Gabe &mdash; Dead simple cron monitoring. Built by <a href="https://github.com/Scolliq">useGabe</a>.</p>
+    </div>
+  </footer>
+
+</body>
+</html>
