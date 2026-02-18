@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gabe vs Cronitor — Cron Job Monitoring Comparison</title>
+  <meta name="description" content="Compare Gabe and Cronitor for cron job monitoring. Free, open-source alternative to Cronitor. No agents required.">
+  <meta name="keywords" content="cronitor alternative, cronitor free alternative, cron monitoring comparison, free cron monitor, open source cronitor">
+  <meta property="og:title" content="Gabe vs Cronitor — Cron Monitoring Comparison">
+  <meta property="og:description" content="Free, open-source alternative to Cronitor. Runs on Cloudflare Workers. No agents required.">
+  <link rel="canonical" href="https://scolliq.github.io/gabe/vs-cronitor">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',-apple-system,sans-serif;background:#09090b;color:#a1a1aa;line-height:1.7;-webkit-font-smoothing:antialiased}
+    a{color:#22d3ee;text-decoration:none}a:hover{text-decoration:underline}
+    .container{max-width:720px;margin:0 auto;padding:0 24px}
+    nav{padding:24px 0;border-bottom:1px solid #18181b}
+    nav .container{display:flex;justify-content:space-between;align-items:center}
+    .logo{font-size:18px;font-weight:700;color:#fafafa;letter-spacing:-.3px}
+    .logo a{color:#fafafa;text-decoration:none}
+    h1{font-size:36px;font-weight:800;color:#fafafa;line-height:1.2;margin:64px 0 16px;letter-spacing:-1px}
+    h2{font-size:22px;font-weight:700;color:#d4d4d8;margin:48px 0 12px}
+    p{margin:0 0 16px;color:#a1a1aa;font-size:15px}
+    table{width:100%;border-collapse:collapse;margin:24px 0 32px}
+    th,td{text-align:left;padding:12px 16px;border-bottom:1px solid #1c1c20;font-size:14px}
+    th{color:#71717a;font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:1px}
+    td{color:#d4d4d8}
+    .highlight{color:#22d3ee;font-weight:600}
+    code{font-family:'JetBrains Mono',monospace;background:#111114;padding:2px 6px;border-radius:4px;font-size:13px}
+    .cta{display:inline-block;background:#fafafa;color:#09090b;padding:12px 24px;border-radius:8px;font-weight:600;font-size:14px;margin:32px 0;text-decoration:none}
+    .cta:hover{background:#e4e4e7;text-decoration:none}
+    footer{padding:48px 0;border-top:1px solid #18181b;text-align:center;margin-top:64px}
+    footer p{font-size:12px;color:#27272a}
+  </style>
+</head>
+<body>
+  <nav><div class="container"><div class="logo"><a href="/gabe/">gabe</a></div></div></nav>
+  <div class="container">
+    <h1>Gabe vs Cronitor</h1>
+    <p>Cronitor is a full-featured monitoring platform. Gabe is a focused cron heartbeat monitor. Here's the comparison.</p>
+
+    <table>
+      <tr><th></th><th>Gabe</th><th>Cronitor</th></tr>
+      <tr><td>Free tier</td><td class="highlight">Yes (3 monitors)</td><td>Yes (5 monitors)</td></tr>
+      <tr><td>Open source</td><td class="highlight">Yes (MIT)</td><td>No</td></tr>
+      <tr><td>Self-hostable</td><td class="highlight">Yes</td><td>No</td></tr>
+      <tr><td>Agent required</td><td class="highlight">No</td><td>Optional (cronitor CLI)</td></tr>
+      <tr><td>Setup</td><td class="highlight">One curl command</td><td>Account + dashboard config</td></tr>
+      <tr><td>Webhook alerts</td><td>Yes</td><td>Yes</td></tr>
+      <tr><td>SMS/Phone alerts</td><td>No</td><td>Yes</td></tr>
+      <tr><td>Dashboard</td><td>API only</td><td>Full web UI</td></tr>
+      <tr><td>Uptime monitoring</td><td>No (cron only)</td><td>Yes</td></tr>
+      <tr><td>CLI tool</td><td>Yes (npm)</td><td>Yes</td></tr>
+      <tr><td>GitHub Action</td><td class="highlight">Yes</td><td>No</td></tr>
+      <tr><td>Paid plan</td><td class="highlight">$4/mo (20 monitors)</td><td>$20/mo (unlimited)</td></tr>
+      <tr><td>Infrastructure</td><td class="highlight">Cloudflare Workers</td><td>Proprietary cloud</td></tr>
+    </table>
+
+    <h2>When to use Gabe</h2>
+    <p>Gabe is for developers who want dead-simple cron monitoring without signing up for another SaaS platform. It's open source, self-hostable, and runs entirely on Cloudflare's free tier. No dashboard to check, no agent to install. Just a curl at the end of your crontab.</p>
+    <p>At $4/mo for 20 monitors vs Cronitor's $20/mo, it's also significantly cheaper if you only need heartbeat monitoring.</p>
+
+    <h2>When to use Cronitor</h2>
+    <p>Cronitor is the better choice if you need uptime monitoring alongside cron monitoring, SMS/phone call alerts, a full web dashboard, or enterprise features like team management and audit logs.</p>
+
+    <a href="/gabe/#pricing" class="cta">Try Gabe free</a>
+  </div>
+  <footer><div class="container"><p><a href="/gabe/" style="color:#3f3f46">Gabe</a> — lightweight cron monitoring</p></div></footer>
+</body>
+</html>

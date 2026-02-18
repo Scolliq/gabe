@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gabe vs Healthchecks.io — Cron Job Monitoring Comparison</title>
+  <meta name="description" content="Compare Gabe and Healthchecks.io for cron job monitoring. Free, open-source, runs on Cloudflare Workers. No Docker or database required.">
+  <meta name="keywords" content="healthchecks.io alternative, healthchecks alternative, cron monitoring comparison, free cron monitor">
+  <meta property="og:title" content="Gabe vs Healthchecks.io — Cron Monitoring Comparison">
+  <meta property="og:description" content="Lightweight alternative to Healthchecks.io. Free, open-source, runs on Cloudflare Workers.">
+  <link rel="canonical" href="https://scolliq.github.io/gabe/vs-healthchecks">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',-apple-system,sans-serif;background:#09090b;color:#a1a1aa;line-height:1.7;-webkit-font-smoothing:antialiased}
+    a{color:#22d3ee;text-decoration:none}a:hover{text-decoration:underline}
+    .container{max-width:720px;margin:0 auto;padding:0 24px}
+    nav{padding:24px 0;border-bottom:1px solid #18181b}
+    nav .container{display:flex;justify-content:space-between;align-items:center}
+    .logo{font-size:18px;font-weight:700;color:#fafafa;letter-spacing:-.3px}
+    .logo a{color:#fafafa;text-decoration:none}
+    h1{font-size:36px;font-weight:800;color:#fafafa;line-height:1.2;margin:64px 0 16px;letter-spacing:-1px}
+    h2{font-size:22px;font-weight:700;color:#d4d4d8;margin:48px 0 12px}
+    p{margin:0 0 16px;color:#a1a1aa;font-size:15px}
+    table{width:100%;border-collapse:collapse;margin:24px 0 32px}
+    th,td{text-align:left;padding:12px 16px;border-bottom:1px solid #1c1c20;font-size:14px}
+    th{color:#71717a;font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:1px}
+    td{color:#d4d4d8}
+    .highlight{color:#22d3ee;font-weight:600}
+    code{font-family:'JetBrains Mono',monospace;background:#111114;padding:2px 6px;border-radius:4px;font-size:13px}
+    .cta{display:inline-block;background:#fafafa;color:#09090b;padding:12px 24px;border-radius:8px;font-weight:600;font-size:14px;margin:32px 0;text-decoration:none}
+    .cta:hover{background:#e4e4e7;text-decoration:none}
+    footer{padding:48px 0;border-top:1px solid #18181b;text-align:center;margin-top:64px}
+    footer p{font-size:12px;color:#27272a}
+  </style>
+</head>
+<body>
+  <nav><div class="container"><div class="logo"><a href="/gabe/">gabe</a></div></div></nav>
+  <div class="container">
+    <h1>Gabe vs Healthchecks.io</h1>
+    <p>Both Gabe and Healthchecks.io are heartbeat-style cron job monitors. Here's how they compare.</p>
+
+    <table>
+      <tr><th></th><th>Gabe</th><th>Healthchecks.io</th></tr>
+      <tr><td>Free monitors</td><td class="highlight">3</td><td>20</td></tr>
+      <tr><td>Self-hostable</td><td class="highlight">Yes (1 command)</td><td>Yes (Docker + Postgres)</td></tr>
+      <tr><td>Infrastructure</td><td class="highlight">Cloudflare Workers (serverless)</td><td>Django + PostgreSQL + Docker</td></tr>
+      <tr><td>Setup complexity</td><td class="highlight">Clone + wrangler deploy</td><td>Docker Compose + env config</td></tr>
+      <tr><td>Webhook alerts</td><td>Yes</td><td>Yes</td></tr>
+      <tr><td>Email alerts</td><td>Pro only</td><td>Yes</td></tr>
+      <tr><td>Slack/Discord</td><td>Yes (via webhook)</td><td>Yes (native)</td></tr>
+      <tr><td>Dashboard</td><td>API only</td><td>Full web UI</td></tr>
+      <tr><td>CLI tool</td><td class="highlight">Yes (npm)</td><td>No</td></tr>
+      <tr><td>GitHub Action</td><td class="highlight">Yes</td><td>No</td></tr>
+      <tr><td>Paid plan</td><td class="highlight">$4/mo</td><td>$20/mo</td></tr>
+      <tr><td>License</td><td>MIT</td><td>BSD-3</td></tr>
+    </table>
+
+    <h2>When to use Gabe</h2>
+    <p>Gabe is the better choice when you want the simplest possible setup. No Docker, no database, no web UI to maintain. If you just need "alert me when my cron job stops running" and nothing else, Gabe does that in one line of curl.</p>
+    <p>Self-hosting Gabe is a single <code>wrangler deploy</code> on Cloudflare's free tier. No server to maintain, no database backups, no Docker updates.</p>
+
+    <h2>When to use Healthchecks.io</h2>
+    <p>Healthchecks.io is the better choice if you need a full web dashboard, more integrations (PagerDuty, Telegram, SMS), or more than 3 free monitors. It's a mature product with years of development behind it.</p>
+
+    <a href="/gabe/#pricing" class="cta">Try Gabe free</a>
+  </div>
+  <footer><div class="container"><p><a href="/gabe/" style="color:#3f3f46">Gabe</a> — lightweight cron monitoring</p></div></footer>
+</body>
+</html>
