@@ -9,7 +9,7 @@ export default {
     };
 
     if (request.method === "OPTIONS") {
-      return json(null, cors, 204);
+      return new Response(null, { status: 204, headers: cors });
     }
 
     // ---- PING ENDPOINTS (no auth needed) ----
