@@ -288,7 +288,11 @@
             <li>2-minute check interval</li>
             <li>Webhook alerts (Slack, Discord, etc.)</li>
           </ul>
-          <a href="https://gabe.usegabe.workers.dev/api/signup" class="plan-btn outline">Create account</a>
+          <form id="signup-form" onsubmit="return doSignup(event)" style="display:flex;gap:8px">
+            <input type="email" id="signup-email" placeholder="you@example.com" required style="flex:1;padding:10px 12px;border-radius:8px;border:1px solid #27272a;background:#111114;color:#d4d4d8;font-size:13px;font-family:inherit;outline:none">
+            <button type="submit" class="plan-btn outline" style="border:1px solid #27272a;cursor:pointer;background:transparent;white-space:nowrap">Sign up</button>
+          </form>
+          <p id="signup-result" style="font-size:12px;margin-top:8px;color:#3f3f46"></p>
         </div>
         <div class="plan pro">
           <div class="plan-label">Pro</div>
@@ -362,5 +366,28 @@
       <p style="font-size:11px"><a href="vs-healthchecks.html">Gabe vs Healthchecks.io</a> &middot; <a href="vs-cronitor.html">Gabe vs Cronitor</a></p>
     </div>
   </footer>
+  <script>
+  async function doSignup(e){
+    e.preventDefault();
+    const el=document.getElementById('signup-result');
+    const email=document.getElementById('signup-email').value;
+    el.style.color='#71717a';el.textContent='Creating account...';
+    try{
+      const r=await fetch('https://gabe.usegabe.workers.dev/api/signup',{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({email})
+      });
+      const d=await r.json();
+      if(d.api_key){
+        el.style.color='#4ade80';
+        el.innerHTML='Your API key: <code style="background:#111114;padding:2px 6px;border-radius:4px;user-select:all">'+d.api_key+'</code><br>Save this — you need it to create monitors.';
+      }else{
+        el.style.color='#f87171';el.textContent=d.error||'Something went wrong.';
+      }
+    }catch(err){
+      el.style.color='#f87171';el.textContent='Network error. Try again.';
+    }
+  }
+  </script>
 </body>
 </html>
