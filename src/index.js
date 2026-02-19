@@ -29,6 +29,11 @@ export default {
       }, cors);
     }
 
+    // ---- STRIPE WEBHOOK (no auth needed, verified by signature) ----
+    if (url.pathname === "/stripe/webhook" && request.method === "POST") {
+      return handleStripeWebhook(request, env, cors);
+    }
+
     // ---- AUTH REQUIRED API ----
     const authResult = await authenticate(request, env);
 
@@ -374,6 +379,104 @@ async function sendRecovery(monitor, env) {
       console.log(`Recovery webhook failed for ${monitor.id}: ${e.message}`);
     }
   }
+}
+
+// ---- STRIPE WEBHOOK ----
+async function handleStripeWebhook(request, env, cors) {
+  const body = await request.text();
+  const sig = request.headers.get("stripe-signature");
+
+  if (!sig || !env.STRIPE_WEBHOOK_SECRET) {
+    return json({ error: "Missing signature." }, cors, 400);
+  }
+
+  // Verify Stripe signature
+  const verified = await verifyStripeSignature(body, sig, env.STRIPE_WEBHOOK_SECRET);
+  if (!verified) {
+    return json({ error: "Invalid signature." }, cors, 400);
+  }
+
+  const event = JSON.parse(body);
+
+  if (event.type === "checkout.session.completed") {
+    const session = event.data.object;
+    const email = session.customer_details?.email || session.customer_email;
+
+    if (email) {
+      await upgradeUser(email, env);
+    }
+  }
+
+  if (event.type === "customer.subscription.deleted") {
+    const subscription = event.data.object;
+    // Look up customer email from Stripe
+    const customerId = subscription.customer;
+    try {
+      const res = await fetch(`https://api.stripe.com/v1/customers/${customerId}`, {
+        headers: { Authorization: `Bearer ${env.STRIPE_SECRET_KEY}` },
+      });
+      const customer = await res.json();
+      if (customer.email) {
+        await downgradeUser(customer.email, env);
+      }
+    } catch (e) {
+      console.log(`Failed to downgrade: ${e.message}`);
+    }
+  }
+
+  return json({ received: true }, cors);
+}
+
+async function upgradeUser(email, env) {
+  const userData = await env.KV.get(`user:${email}`);
+  if (!userData) return;
+
+  const user = JSON.parse(userData);
+  user.plan = "pro";
+  user.monitor_limit = 20;
+
+  await env.KV.put(`user:${email}`, JSON.stringify(user));
+  await env.KV.put(`apikey:${user.apiKey}`, JSON.stringify(user));
+}
+
+async function downgradeUser(email, env) {
+  const userData = await env.KV.get(`user:${email}`);
+  if (!userData) return;
+
+  const user = JSON.parse(userData);
+  user.plan = "free";
+  user.monitor_limit = 3;
+
+  await env.KV.put(`user:${email}`, JSON.stringify(user));
+  await env.KV.put(`apikey:${user.apiKey}`, JSON.stringify(user));
+}
+
+async function verifyStripeSignature(payload, header, secret) {
+  const parts = header.split(",").reduce((acc, part) => {
+    const [key, val] = part.split("=");
+    acc[key.trim()] = val;
+    return acc;
+  }, {});
+
+  const timestamp = parts["t"];
+  const signature = parts["v1"];
+  if (!timestamp || !signature) return false;
+
+  // Reject timestamps older than 5 minutes
+  if (Math.abs(Date.now() / 1000 - Number(timestamp)) > 300) return false;
+
+  const signedPayload = `${timestamp}.${payload}`;
+  const key = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"]
+  );
+  const sig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(signedPayload));
+  const expected = Array.from(new Uint8Array(sig)).map(b => b.toString(16).padStart(2, "0")).join("");
+
+  return expected === signature;
 }
 
 // ---- HELPERS ----
